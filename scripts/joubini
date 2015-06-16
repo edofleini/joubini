@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+import joubini.cli
+
+cli = joubini.cli.CLIDispatcher()
+
+cli.do_stuff()
