@@ -43,10 +43,10 @@ def get(env, key, region='us-east-1', **kwargs):
     return load_env(env=env, region=region, keys=[key]).get(key)
 
 # not tested
-def set(env, key, value, region='us-east-1', **kwargs):
+def set(env, key, value, region='us-east-1', env_row = None, **kwargs):
     if key == HASH_KEY:
         raise Exception('Cannot use set to change the {0} attribute.'.format(HASH_KEY))
-    env_row = load_env(env=env, region=region)
+    env_row = env_row if env_row else load_env(env=env, region=region)
     env_row[key] = value
     env_row.save()
 
@@ -57,3 +57,23 @@ def unset(env, key, region='us-east-1', **kwargs):
     env_row = load_env(env=env, region=region)
     env_row.delete_attribute(attr_name=key)
     env_row.save()
+
+# not tested
+def import_environment_from_joubini(env=None, region='us-east-1', ignore=[], **kwargs):
+    env = env if env else os.environ.get(HASH_KEY, None)
+    if not env:
+        raise Exception('For import_environment_from_joubini, env must either be provided as a parameter or stored as an environment variable in {0}.'.format(HASH_KEY))
+    env_row = load_env(env=env, region=region)
+    for key in env_row.keys():
+        if key not in ignore:
+            os.environ[key]=env_row[key]
+
+# not tested
+def export_environment_to_joubini(env=None, region='us-east-1', ignore=[], **kwargs):
+    env = env if env else os.environ.get(HASH_KEY, None)
+    if not env:
+        raise Exception('For export_environment_to_joubini, env must either be provided as a parameter or stored as an environment variable in {0}.'.format(HASH_KEY))
+    env_row = load_env(env=env, region=region)
+    for key in os.environ.keys():
+        if not key in ignore + [HASH_KEY]:
+            set(env=env, key=key, value=os.environ[key], env_row=env_row, region=region)
