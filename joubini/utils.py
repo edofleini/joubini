@@ -59,6 +59,10 @@ def unset(env, key, region='us-east-1', **kwargs):
     env_row.save()
 
 # not tested
+def delete(env, region='us-east-1', **kwargs):
+    load_env(env=env, region=region).delete()
+
+# not tested
 def import_environment_from_joubini(env=None, region='us-east-1', ignore=[], **kwargs):
     env = env if env else os.environ.get(HASH_KEY, None)
     if not env:

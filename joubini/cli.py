@@ -79,9 +79,7 @@ class CLIDispatcher:
         joubini.unset(**kwargs)
 
     def delete(self, **kwargs):
-        env = kwargs['env']
-        print('Not yet implemented.')
-        exit(1)
+        joubini.delete(**kwargs)
 
     def get_argument_parser(self):
         parser = argparse.ArgumentParser(description='Interact with joubini from the command line.')
