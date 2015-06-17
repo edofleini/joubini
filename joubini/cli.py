@@ -73,7 +73,7 @@ class CLIDispatcher:
         del kwargs['key']
         del kwargs['value']
         for key in env.keys():
-            if not key in kwargs['ignore']:
+            if not key in kwargs['ignore'] + [joubini.HASH_KEY]:
                 joubini.set(key=key, value=env[key], **kwargs)
 
     def get(self, **kwargs):
@@ -106,7 +106,7 @@ class CLIDispatcher:
         parser.add_argument('-e', '--env', default=None, help='Argument: The name of the environment.')
         parser.add_argument('-k', '--key', default=None, help='Argument: The name of the variable to store.')
         parser.add_argument('-v', '--value', default=None, help='Argument: The value of the variable to store.')
-        parser.add_argument('--ignore', default=[joubini.HASH_KEY], nargs='+', help='Argument: Environment variables to ignore.  Only used by import-environment.')
+        parser.add_argument('--ignore', default=[], nargs='+', help='Argument: Environment variables to ignore.  Only used by import-environment.')
         parser.add_argument('-f', '--force', action='store_true', help='Argument: Skip normal confirmation prompts.  Optional for all calls.  May or may not do anything depending on whether or not I\'ve implemented it.')
         parser.add_argument('--verbose', action='store_true', help='Argument: Print random usually-useless information.  May or may not print anything depending on whether or not I\'ve implemented it yet, as I haven\'t right now.  Optional for all calls.')
 
