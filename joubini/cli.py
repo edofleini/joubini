@@ -2,6 +2,7 @@
 
 import argparse
 import joubini.utils as joubini
+import os
 
 class CLIDispatcher:
 
@@ -13,6 +14,14 @@ class CLIDispatcher:
         'print_environment':{
             'help':'Print all entries in the specified environment.',
             'initial':'p'
+            },
+        'export_environment':{
+            'help':'Print all entries in the specified environment in a format that can exec\'d to add them to the Linux environment.  Run the command in backticks (`joubini -x -e foo`) in order to do this.',
+            'initial':'x'
+            },
+        'import_environment':{
+            'help':'Store all entries in the current Linux environment to the provided joubini env.  Any variables that are currently in joubini will be overwritten.',
+            'initial':'i'
             },
         'get':{
             'help':'Get the specified environment variable.',
@@ -33,11 +42,39 @@ class CLIDispatcher:
         }
 
     def list_environments(self, **kwargs):
-        print('Not yet implemented.')
-        exit(1)
+        envs = joubini.list_envs(**kwargs)
+        for env in envs:
+            print(env)
 
     def print_environment(self, **kwargs):
-        print(joubini.load_env(**kwargs))
+        env = joubini.load_env(**kwargs)
+        max_length = max([len(key) for key in env.keys()])
+        spacing = max_length + 2
+        keys = env.keys()
+        keys.remove(joubini.HASH_KEY)
+        keys.insert(0, joubini.HASH_KEY)
+        for key in keys:
+            header = key + ': '
+            spacer = ' ' * (spacing - len(header))
+            print('{0}{1}{2}'.format(header,spacer,env[key]))
+
+    def export_environment(self, **kwargs):
+        env = joubini.load_env(**kwargs)
+        max_length = max([len(key) for key in env.keys()])
+        spacing = max_length + 2
+        keys = env.keys()
+        keys.remove(joubini.HASH_KEY)
+        keys.insert(0, joubini.HASH_KEY)
+        for key in keys:
+            print('export {0}={1}'.format(key,env[key]))
+
+    def import_environment(self, **kwargs):
+        env = os.environ
+        del kwargs['key']
+        del kwargs['value']
+        for key in env.keys():
+            if not key in kwargs['ignore']:
+                joubini.set(key=key, value=env[key], **kwargs)
 
     def get(self, **kwargs):
         print(joubini.get(**kwargs))
@@ -46,10 +83,7 @@ class CLIDispatcher:
         joubini.set(**kwargs)
 
     def unset(self, **kwargs):
-        env = kwargs['env']
-        key = kwargs['key']
-        print('Not yet implemented.')
-        exit(1)
+        joubini.unset(**kwargs)
 
     def delete(self, **kwargs):
         env = kwargs['env']
@@ -72,6 +106,7 @@ class CLIDispatcher:
         parser.add_argument('-e', '--env', default=None, help='Argument: The name of the environment.')
         parser.add_argument('-k', '--key', default=None, help='Argument: The name of the variable to store.')
         parser.add_argument('-v', '--value', default=None, help='Argument: The value of the variable to store.')
+        parser.add_argument('--ignore', default=[joubini.HASH_KEY], nargs='+', help='Argument: Environment variables to ignore.  Only used by import-environment.')
         parser.add_argument('-f', '--force', action='store_true', help='Argument: Skip normal confirmation prompts.  Optional for all calls.  May or may not do anything depending on whether or not I\'ve implemented it.')
         parser.add_argument('--verbose', action='store_true', help='Argument: Print random usually-useless information.  May or may not print anything depending on whether or not I\'ve implemented it yet, as I haven\'t right now.  Optional for all calls.')
 

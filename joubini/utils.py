@@ -7,7 +7,7 @@ from boto.exception import DynamoDBResponseError
 import json
 import time
 
-HASH_KEY = 'joubini-environment-name'
+HASH_KEY = 'JOUBINI_ENVIRONMENT_NAME'
 
 # not tested
 def get_joubini_table(region='us-east-1', read_throughput=1, write_throughput=1, **kwargs):
@@ -33,13 +33,27 @@ def load_env(env, region='us-east-1', keys=None, **kwargs):
         return table.new_item(attrs={HASH_KEY:env})
 
 # not tested
+def list_envs(region='us-east-1', **kwargs):
+    table = get_joubini_table(region=region)
+    return [item[HASH_KEY] for item in table.scan(attributes_to_get=[HASH_KEY])]
+
+# not tested
 def get(env, key, region='us-east-1', **kwargs):
     return load_env(env=env, region=region, keys=[key]).get(key)
 
 # not tested
 def set(env, key, value, region='us-east-1', **kwargs):
     if key == HASH_KEY:
-        raise Exception('Cannot use put_value to change the environment attribute.')
+        raise Exception('Cannot use set to change the {0} attribute.'.format(HASH_KEY))
     env_row = load_env(env=env, region=region)
     env_row[key] = value
     env_row.save()
+
+# not tested
+def unset(env, key, region='us-east-1', **kwargs):
+    if key == HASH_KEY:
+        raise Exception('Cannot use unset to change the {0} attribute.'.format(HASH_KEY))
+    env_row = load_env(env=env, region=region)
+    env_row.delete_attribute(attr_name=key)
+    env_row.save()
+
