@@ -58,6 +58,7 @@ class CLIDispatcher:
             spacer = ' ' * (spacing - len(header))
             print('{0}{1}{2}'.format(header,spacer,env[key]))
 
+    # move this to utils.py and have it update the env directly
     def export_environment(self, **kwargs):
         env = joubini.load_env(**kwargs)
         max_length = max([len(key) for key in env.keys()])
@@ -68,6 +69,7 @@ class CLIDispatcher:
         for key in keys:
             print('export {0}={1}'.format(key,env[key]))
 
+    # move this to utils.py and have it update the env directly
     def import_environment(self, **kwargs):
         env = os.environ
         del kwargs['key']

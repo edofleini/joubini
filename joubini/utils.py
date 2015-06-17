@@ -5,6 +5,7 @@ import boto.dynamodb
 from boto.dynamodb.condition import *
 from boto.exception import DynamoDBResponseError
 import json
+import os
 import time
 
 HASH_KEY = 'JOUBINI_ENVIRONMENT_NAME'
@@ -56,4 +57,3 @@ def unset(env, key, region='us-east-1', **kwargs):
     env_row = load_env(env=env, region=region)
     env_row.delete_attribute(attr_name=key)
     env_row.save()
-
