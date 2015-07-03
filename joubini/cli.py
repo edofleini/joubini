@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-import joubini.utils as joubini
+import joubini
 import os
 
 class CLIDispatcher:
